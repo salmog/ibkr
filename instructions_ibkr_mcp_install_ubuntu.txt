@@ -1,0 +1,109 @@
+Setup Brokers MCP on Ubuntu Headless
+Step	Command / Action	Explanation
+1. Update system	sudo apt update && sudo apt upgrade -y	Update package lists and upgrade existing packages
+2. Install required packages	sudo apt install -y git python3 python3-venv python3-pip curl unzip build-essential wget nano	Installs Git, Python 3, pip, virtualenv, and editor
+3. Clone MCP repository	git clone https://github.com/MCP-Mirror/itay1542_brokers-mcp.git
+cd itay1542_brokers-mcp	Download the brokers MCP source code and enter directory
+4. Create project virtual environment	python3 -m venv .venv
+source .venv/bin/activate	Create and activate isolated Python environment inside repo
+5. Upgrade pip inside venv	pip install --upgrade pip	Ensure latest pip version
+6. Install uv package	pip install uv	MCP server requires uv for running and dependency management
+7. Install MCP dependencies	uv sync	Reads pyproject.toml and installs all required Python packages
+8. Configure broker credentials	cp .env.example .env
+nano .env	Fill in IBKR (and optional Schwab) credentials:
+- IBKR_CLIENT_ID
+- IBKR_ACCOUNT_ID
+- IBKR_REDIRECT_URI
+- Optional: TRADESTATION_KEY / TRADESTATION_SECRET
+9. Install IB Gateway (headless)	wget https://download2.interactivebrokers.com/installers/ibgateway/stable/IBGateway-latest-standalone-linux-x64.sh
+chmod +x IBGateway-latest-standalone-linux-x64.sh
+./IBGateway-latest-standalone-linux-x64.sh	Install IB Gateway for paper/live trading; configure login
+10. Start MCP server	uv run brokers_mcp --active	Starts MCP server using active virtual environment
+11. Test MCP server	curl http://127.0.0.1:8000/tools/get_positions	Verifies server is running and returns account positions
+12. Optional: run MCP server as systemd service	sudo nano /etc/systemd/system/brokers-mcp.service
+Paste:
+[Unit]
+Description=Brokers MCP Server
+After=network.target
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/itay1542_brokers-mcp
+ExecStart=/home/ubuntu/itay1542_brokers-mcp/.venv/bin/uv run brokers_mcp --active
+Restart=always
+[Install]
+WantedBy=multi-user.target
+sudo systemctl daemon-reload
+sudo systemctl enable brokers-mcp
+sudo systemctl start brokers-mcp
+
+____________
+Notes
+
+Always activate venv before using MCP: source .venv/bin/activate
+
+Default MCP server listens on 127.0.0.1:8000
+
+Use uv run brokers_mcp --active to avoid .venv mismatch errors
+
+For testing MCP tools you can also install MCP CLI (Node.js required):
+
+npm install -g @modelcontextprotocol/cli
+mcptool call ./ get_positions
+
+
+____________
+MCP-Trader Project Folder Structure
+Folder / File	Purpose / Description
+mcp-trader/	Root of your project (Git repo)
+mcp-trader/.venv/	Virtual environment for Python dependencies
+mcp-trader/.env	Stores IBKR / Schwab API credentials (not committed to Git)
+mcp-trader/agent/	Main trading agent scripts
+mcp-trader/agent/main.py	Agent entry point: loops through tickers → scores → places orders via MCP
+mcp-trader/agent/utils.py	Helper functions for calculations, risk checks, formatting orders
+mcp-trader/strategies/	Python scripts defining trading strategies
+mcp-trader/strategies/strategy_x.py	Example: “short put spread if IVR>30%” logic, returns orders & signals
+mcp-trader/backtests/	Scripts and notebooks to backtest strategies on historical data
+mcp-trader/backtests/historical_data/	Store CSVs or downloaded OHLC + options chain data
+mcp-trader/backtests/test_strategy_x.ipynb	Jupyter notebook for testing strategy_x.py logic
+mcp-trader/data/	Raw / processed market data (tickers, option chains, snapshots)
+mcp-trader/logs/	Logs of agent runs, trades, errors
+mcp-trader/config/	Config files: trading parameters, risk settings, filters
+mcp-trader/config/risk.json	Max risk per trade, daily loss limits, max open positions
+mcp-trader/config/filters.json	Filtering rules for tickers/options (min OI, max spread, etc.)
+mcp-trader/tests/	Unit tests for strategy logic, utils, and agent functions
+mcp-trader/README.md	Project documentation, instructions, MCP setup notes
+mcp-trader/requirements.txt	Optional: additional Python packages not in MCP pyproject.toml
+mcp-trader/.gitignore	Ignore .venv, logs, .env, data snapshots, etc.
+✅ Recommended workflow
+
+Backtest first:
+
+Put historical data in backtests/historical_data/.
+
+Implement strategy logic in strategies/.
+
+Run notebooks in backtests/ to test performance.
+
+Build the agent:
+
+Agent reads strategy output, applies risk/filters from config/.
+
+Calls MCP server tools (get_market_data, place_order, etc.).
+
+Logs all actions to logs/.
+
+Run paper trading first:
+
+Activate .venv.
+
+Start MCP server.
+
+Run agent/main.py with paper account credentials.
+
+Iterate and extend:
+
+Add new strategies as new .py in strategies/.
+
+Add new helper functions in agent/utils.py.
+
+Update risk & filter configs in config/.
