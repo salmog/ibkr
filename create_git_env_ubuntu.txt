@@ -1,0 +1,20 @@
+Here’s a clear, step-by-step table for setting up a GitHub repo on a headless Ubuntu VM, from scratch to working pull/push:
+
+Step	Command / Action	Description
+1	sudo apt update && sudo apt install -y git	Install Git on Ubuntu
+2	git --version	Verify Git installed
+3	git config --global user.name "salmog"	Set Git user name
+4	git config --global user.email "salmog@akamai.com"	Set Git email
+5	ssh-keygen -t ed25519 -C "salmog@akamai.com"	Generate SSH key (press Enter for default path, optional passphrase)
+6	eval "$(ssh-agent -s)"	Start SSH agent
+7	ssh-add ~/.ssh/id_ed25519	Add SSH key to agent
+8	cat ~/.ssh/id_ed25519.pub	Copy public key to clipboard
+9	GitHub UI → Settings → SSH and GPG keys → New SSH key	Paste the key, give a name like “Ubuntu VM”, and save
+10	ssh -T git@github.com	Test connection; should get Hi salmog! You've successfully authenticated…
+11	git clone git@github.com:salmog/ibkrrepo.git	Clone your repo to VM
+12	cd ibkrrepo	Enter repo folder
+13	echo "test" > test.txt	Example: create a file
+14	git add test.txt	Stage file for commit
+15	git commit -m "Add test file"	Commit changes
+16	git push origin main	Push to GitHub (replace main if branch name is different)
+17	git pull origin main	Pull latest changes from GitHub
