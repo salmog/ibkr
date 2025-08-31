@@ -1,0 +1,1 @@
+wget -O nasdaq.csv https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt
