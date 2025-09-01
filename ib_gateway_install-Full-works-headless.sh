@@ -144,13 +144,14 @@ echo "Access noVNC at: http://<SERVER_IP>:6080/vnc.html"
 echo "Login password: 2"
 echo "User shay password: 1"
 echo
-echo Run installer once via noVNC as user *shay*: su shay
-echo cd /home 
-echo "➡️  Run installer once via noVNC:
-echo "DISPLAY=:1 ~/ibgateway.sh"
+echo "Run installer once via noVNC as user shay:"
+echo "  su shay"
+echo "  cd /home/shay"
+echo "➡️ Run installer once via noVNC:"
+echo "  DISPLAY=:1 ~/ibgateway.sh"
 echo
-echo "   (accept defaults so ~/Jts is created)"
-echo Accept defaults (installer will create ~/Jts/ibgateway/<version>).
-echo su - shay -c "ln -sfn /home/shay/Jts/ibgateway/<version> /home/shay/Jts/ibgateway/current"
-echo "➡️  "After that, IB Gateway auto-starts at boot via systemd.""
+echo "  (accept defaults so ~/Jts is created)"
+echo "Accept defaults (installer will create ~/Jts/ibgateway/<version>)."
+echo "  su - shay -c 'ln -sfn /home/shay/Jts/ibgateway/<version> /home/shay/Jts/ibgateway/current'"
+echo "➡️ After that, IB Gateway auto-starts at boot via systemd."
 echo "=================================================="
