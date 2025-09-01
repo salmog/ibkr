@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+from ib_insync import IB, Stock, util
+import pandas as pd
+import time
+
+# =========================
+# Config
+# =========================
+IB_HOST = '127.0.0.1'
+IB_PORT = 4001
+CLIENT_ID = 2
+OUTPUT_CSV = 'tickers2_filtered_ibkr.csv'
+
+RATE_LIMIT_SEC = 0.3
+
+# =========================
+# Connect to IB
+# =========================
+ib = IB()
+ib.connect(IB_HOST, IB_PORT, clientId=CLIENT_ID)
+print("Connected to IB Gateway")
+
+# =========================
+# Step 1: Get all NASDAQ tickers from IBKR
+# =========================
+# IBKR does not provide direct bulk lists. Use the `reqContractDetails`
+# with exchange="NASDAQ" for each symbol list.
+# Simplest way: download from NASDAQ official list
+nasdaq_url = "https://api.nasdaq.com/api/screener/stocks?tableonly=true&exchange=nasdaq&download=true"
+df = pd.read_json(nasdaq_url)
+symbols = df['data']['rows']
+tickers = pd.DataFrame(symbols)[['symbol','marketCap']]
+
+# Convert marketCap to numeric
+tickers['marketCap'] = pd.to_numeric(tickers['marketCap'], errors='coerce')
+
+# Filter Market Cap > 1.5B
+tickers = tickers[tickers['marketCap'] > 1_500_000_000]
+
+print(f"Found {len(tickers)} symbols with MarketCap > 1.5B")
+
+# =========================
+# Step 2: Check Liquidity (30d avg dollar volume)
+# =========================
+valid_symbols = []
+
+for sym in tickers['symbol']:
+    try:
+        contract = Stock(sym, 'SMART', 'USD')
+        bars = ib.reqHistoricalData(
+            contract,
+            endDateTime='',
+            durationStr='30 D',
+            barSizeSetting='1 day',
+            whatToShow='TRADES',
+            useRTH=True
+        )
+        if not bars:
+            continue
+        df_bars = util.df(bars)[['close','volume']]
+        avg_price = df_bars['close'].mean()
+        avg_volume = df_bars['volume'].mean()
+        dollar_vol = avg_price * avg_volume
+        if dollar_vol >= 25_000_000:
+            valid_symbols.append(sym)
+            print(f"{sym}: Liquidity ${dollar_vol:,.0f} ✅")
+        else:
+            print(f"{sym}: Liquidity ${dollar_vol:,.0f} ❌")
+    except Exception as e:
+        print(f"Error {sym}: {e}")
+    time.sleep(RATE_LIMIT_SEC)
+
+# =========================
+# Step 3: Save results
+# =========================
+pd.DataFrame(valid_symbols, columns=['symbol']).to_csv(OUTPUT_CSV, index=False)
+print(f"Saved {len(valid_symbols)} tickers -> {OUTPUT_CSV}")
