@@ -1,8 +1,29 @@
-# Run talib script first as user shay!! :
+# Ran talib script first as user shay!! :
 # sudo nano talib.sh
 # sudo bash talib.sh
 #
-# sudo nano /root/setup_env.sh
+#Here's the final fixed version of your setup_env.sh script, fully cleaned and updated based on:
+
+#✅ Running as root
+
+#✅ Installs Docker Engine + Compose plugin
+
+#✅ Uses docker compose (not docker-compose)
+
+#✅ Creates project at /home/shay/py-env-ibkr
+
+#✅ Uses 5 sample tickers only
+
+#✅ Skips TA-Lib C install (already done)
+
+#✅ Installs Python deps in new venv (venv-ibkr)
+
+#✅ Prepares Docker + TimescaleDB + Redis
+
+#✅ Creates .env and database schema
+
+# ✅ To save and run: 
+#sudo nano /root/setup_env.sh
 # sudo chmod +x /root/setup_env.sh
 # Run the script as root sudo /root/setup_env.sh
 # Reboot to apply Docker group change
