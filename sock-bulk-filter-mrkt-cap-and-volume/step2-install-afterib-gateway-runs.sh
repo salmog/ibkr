@@ -171,7 +171,14 @@ if [ -z "$CONTAINER_ID" ]; then
     exit 1
 fi
 
+echo "⏳ Waiting for TimescaleDB to be ready..."
+until docker exec -i $CONTAINER_ID pg_isready -U pguser -d stockdb > /dev/null 2>&1; do
+    sleep 2
+done
+
 docker exec -i $CONTAINER_ID psql -U pguser -d stockdb < $SCHEMA_FILE
+echo "✅ TimescaleDB schema created"
+
 
 echo "======================================"
 echo "STEP 4: Create tickers.csv (5 tickers only)"
