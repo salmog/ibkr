@@ -92,7 +92,7 @@ WantedBy=multi-user.target
 EOF
 
 # --- 8. noVNC service ---
-tee /etc/systemd/system/novnc.service >/dev/null <<EOF
+sudo tee /etc/systemd/system/novnc.service >/dev/null <<EOF
 [Unit]
 Description=noVNC server on :1
 After=x11vnc.service
@@ -101,7 +101,7 @@ Requires=x11vnc.service
 [Service]
 User=shay
 Environment=DISPLAY=:1
-ExecStart=/usr/bin/websockify --web=/usr/share/novnc/ 6080 localhost:5901
+ExecStart=/usr/bin/websockify --web=/usr/share/novnc/ 6080 0.0.0.0:5901
 Restart=always
 
 [Install]
