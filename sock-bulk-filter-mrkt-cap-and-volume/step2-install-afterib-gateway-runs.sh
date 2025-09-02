@@ -25,7 +25,8 @@
 # ✅ To save and run: 
 #sudo nano /root/setup_env.sh
 # sudo chmod +x /root/setup_env.sh
-# Run the script as root sudo /root/setup_env.sh
+# Run the script as root:
+# sudo bash /root/setup_env.sh
 # Reboot to apply Docker group change
 
 # Then log in as shay, activate env, and ingest:
