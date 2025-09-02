@@ -1,15 +1,17 @@
-Run talib script first as user shay!!
+# Run talib script first as user shay!! :
+# sudo nano talib.sh
+# sudo bash talib.sh
+#
+# sudo nano /root/setup_env.sh
+# sudo chmod +x /root/setup_env.sh
+# Run the script as root sudo /root/setup_env.sh
+# Reboot to apply Docker group change
 
-sudo nano /root/setup_env.sh
-sudo chmod +x /root/setup_env.sh
-Run the script as root sudo /root/setup_env.sh
-Reboot to apply Docker group change
-
-Then log in as shay, activate env, and ingest:
-su - shay
-cd ~/py-env-ibkr
-source venv-ibkr/bin/activate
-python ingest_daily.py
+# Then log in as shay, activate env, and ingest:
+# su - shay
+# cd ~/py-env-ibkr
+# source venv-ibkr/bin/activate
+# python ingest_daily.py
 
 
 #!/bin/bash
