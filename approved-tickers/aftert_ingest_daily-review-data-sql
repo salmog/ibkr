@@ -1,0 +1,22 @@
+I’ll assume:
+
+You just ran ingest_daily.py
+
+Data exists in price_daily
+
+You may want to check tickers and ticker_status
+
+Here’s a super-clear table of commands you can keep in your repo.
+
+📌 Step-by-Step Commands
+Step	Purpose	Command / SQL
+1	Enter TimescaleDB container	docker exec -it py-env-ibkr-timescaledb-1 psql -U pguser -d stockdb
+2	List all tables	\dt
+3	Check number of tickers tracked	SELECT COUNT(*) FROM tickers;
+4	View sample tickers	SELECT * FROM tickers LIMIT 10;
+5	View distinct symbols with price data	SELECT DISTINCT symbol FROM price_daily ORDER BY symbol;
+6	Check price data count	SELECT COUNT(*) FROM price_daily;
+7	View last 5 days of price for a ticker (example: TSLA)	SELECT * FROM price_daily WHERE symbol='TSLA' ORDER BY ts DESC LIMIT 5;
+8	Backfill tickers table from price_daily if empty	INSERT INTO tickers (symbol) SELECT DISTINCT symbol FROM price_daily ON CONFLICT (symbol) DO NOTHING;
+9	Check ingestion status per ticker	SELECT * FROM ticker_status ORDER BY last_ingest_ts DESC LIMIT 10;
+10	Exit PostgreSQL shell	\q
