@@ -113,10 +113,22 @@ fi
 # Silent install (no GUI clicks needed)
 ./ibgateway.sh -q -dir /home/shay/Jts
 
+# Wait until installer creates at least one version folder
+for i in {1..20}; do
+  if [ -d ~/Jts/ibgateway ] && [ "$(ls -1 ~/Jts/ibgateway | wc -l)" -gt 0 ]; then
+    break
+  fi
+  echo "⏳ Waiting for IB Gateway installation to finish ($i/20)..."
+  sleep 3
+done
+
 # Symlink "current" to latest version
-latest=$(ls -1 ~/Jts/ibgateway | sort -V | tail -n1)
-ln -sfn /home/shay/Jts/ibgateway/$latest ~/Jts/ibgateway/current
+if [ -d ~/Jts/ibgateway ]; then
+  latest=$(ls -1 ~/Jts/ibgateway | sort -V | tail -n1)
+  ln -sfn /home/shay/Jts/ibgateway/$latest /home/shay/Jts/ibgateway/current
+fi
 '
+
 
 # --- 11. Launcher for IB Gateway ---
 sudo -u shay bash -c 'cat > ~/start-ibgateway.sh <<EOF
