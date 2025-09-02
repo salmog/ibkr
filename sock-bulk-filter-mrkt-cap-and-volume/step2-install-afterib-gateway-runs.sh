@@ -128,7 +128,7 @@ sudo -u $USER bash -c "
   cd $PROJECT_DIR
   docker compose up -d
 "
-
+sleep 5  # optional, ensures containers start before next step
 echo "======================================"
 echo "STEP 3: Setup TimescaleDB Schema"
 echo "======================================"
