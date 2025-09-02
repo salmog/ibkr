@@ -1,0 +1,8 @@
+# Copy tickers.csv into container (if needed)
+docker cp /home/shay/py-env-ibkr/tickers.csv py-env-ibkr-timescaledb-1:/var/lib/postgresql/data/tickers.csv
+
+# Export price_daily to CSV inside container
+docker exec -i py-env-ibkr-timescaledb-1 psql -U pguser -d stockdb -c "\copy price_daily TO '/var/lib/postgresql/data/price_daily.csv' WITH CSV HEADER"
+
+# Copy CSV back to host
+docker cp py-env-ibkr-timescaledb-1:/var/lib/postgresql/data/price_daily.csv ./price_daily.csv
