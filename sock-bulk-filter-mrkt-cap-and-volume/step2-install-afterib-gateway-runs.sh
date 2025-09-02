@@ -1,3 +1,5 @@
+Run talib script first as user shay!!
+
 sudo nano /root/setup_env.sh
 sudo chmod +x /root/setup_env.sh
 Run the script as root sudo /root/setup_env.sh
