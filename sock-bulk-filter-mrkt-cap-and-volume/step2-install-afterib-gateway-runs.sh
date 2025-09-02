@@ -139,7 +139,7 @@ EOL
 
 chown $USER:$USER $SCHEMA_FILE
 
-CONTAINER_ID=$(docker ps --filter ancestor=timescale/timescaledb -q | head -n1)
+CONTAINER_ID=$(docker ps --filter "name=py-env-ibkr-timescaledb-1" -q)
 if [ -z "$CONTAINER_ID" ]; then
     echo "❌ TimescaleDB container not found. Exiting."
     exit 1
