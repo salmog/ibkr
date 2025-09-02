@@ -31,21 +31,31 @@ chown -R shay:shay /home/shay/.vnc
 chmod 600 /home/shay/.vnc/novnc_passwd
 sudo -u shay x11vnc -storepasswd 2 /home/shay/.vnc/passwd
 
-# --- 5. Xvfb service ---
-tee /etc/systemd/system/xvfb.service >/dev/null <<EOF
+# 5. Openbox service (with xterm + IB Gateway)
+tee /etc/systemd/system/openbox.service >/dev/null <<'EOF'
 [Unit]
-Description=Xvfb headless display :1
-After=network.target
+Description=Openbox WM on :1
+After=xvfb.service
+Requires=xvfb.service
 
 [Service]
 User=shay
 Environment=DISPLAY=:1
-ExecStart=/usr/bin/Xvfb :1 -screen 0 1280x800x24 -nolisten tcp -ac
+ExecStart=/bin/sh -c '
+    /usr/bin/openbox --sm-disable &
+    sleep 2
+    /usr/bin/xterm &
+    if [ -x /home/shay/start-ibgateway.sh ]; then
+        /home/shay/start-ibgateway.sh &
+    fi
+    wait
+'
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
 EOF
+
 
 # --- 6. Openbox service ---
 tee /etc/systemd/system/openbox.service >/dev/null <<'EOF'
